@@ -2,10 +2,8 @@ package com.poison.wechart.common.error;
 
 import com.poison.wechart.common.json.Response;
 import com.poison.wechart.common.json.ResponseHelper;
-import com.poison.wechart.common.json.ReturnCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -45,11 +43,4 @@ class ControllerExceptionHandler {
 
     }
 
-    @ExceptionHandler(value = DataAccessException.class)
-    @ResponseBody
-    @ResponseStatus(HttpStatus.OK)
-    public Response<?> exception(DataAccessException exception) {
-        logger.debug("DataAccessException : ", exception);
-        return ResponseHelper.createResponse(ReturnCode.EXCEPTION, "数据库访问异常：" + exception.getClass().getSimpleName());
-    }
 }
