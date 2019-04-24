@@ -1,0 +1,19 @@
+
+server:
+  port: 80
+
+#  主数据库定义（Primary）
+spring:
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: "jdbc:mysql://poison1994.cn:3306/elasticsearch?serverTimezone=UTC"
+    username: "root"
+    password: "taobuchu0"
+    hikari:
+      maximum-pool-size: 20 #连接池同一时间可分配的最大活跃连接数，默认是10
+
+
+weChart:
+  corpId: "wwe118e5ecfce0635a"
+  corpSecret: "moWFBcUbTpL5Mqk4hB1f9c-mgpZWYL2m6xd47TS5vZM"
