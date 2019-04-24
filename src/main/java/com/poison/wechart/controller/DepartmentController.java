@@ -5,6 +5,7 @@ import com.poison.wechart.common.json.ResponseHelper;
 import com.poison.wechart.service.department.DepartmentService;
 import com.poison.wechart.vo.Department;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,9 +20,9 @@ public class DepartmentController {
     private DepartmentService departmentService;
 
     //部门列表
-    @RequestMapping(value = "", method = RequestMethod.GET)
-    public Response<?> findAllDepartments() {
-        List<Department>departments=departmentService.findAllDepartments();
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+    public Response<?> findAllDepartments(@PathVariable Long id) {
+        List<Department>departments=departmentService.findAllDepartments(id);
         return ResponseHelper.createSuccessResponse(departments);
     }
 

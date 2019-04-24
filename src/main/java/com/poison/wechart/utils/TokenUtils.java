@@ -2,12 +2,10 @@ package com.poison.wechart.utils;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.poison.wechart.service.SendMsgService;
 import com.poison.wechart.vo.UrlData;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
@@ -20,7 +18,6 @@ import java.util.Map;
 @Component
 public class TokenUtils {
     private CloseableHttpClient httpClient;
-    private HttpPost httpPost;//用于提交登陆数据
     private HttpGet httpGet;//用于获得登录后的页面
     private static Gson gson = new Gson();
 

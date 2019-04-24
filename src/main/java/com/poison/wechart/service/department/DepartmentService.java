@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface DepartmentService {
 
-    List<Department> findAllDepartments();
+    List<Department> findAllDepartments(Long id);
 }
