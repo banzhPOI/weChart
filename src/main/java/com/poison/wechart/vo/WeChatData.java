@@ -10,6 +10,7 @@ public class WeChatData {
     private String totag;
     private String msgtype;
     private Integer agentid;
+    private Object file;
     private Object text;
     private String content;
     private Integer safe;

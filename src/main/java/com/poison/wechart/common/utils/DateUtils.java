@@ -9,7 +9,7 @@ public class DateUtils {
 
     public static String getNowStr() {
         Date now = new Date();
-        SimpleDateFormat format0 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat format0 = new SimpleDateFormat("yyyyMMddHHmmss");
         String nowStr = format0.format(now);//这个就是把时间戳经过处理得到期望格式的时间
         return nowStr;
     }

@@ -3,6 +3,7 @@ package com.poison.wechart.service.message;
 import com.poison.wechart.common.error.CodeException;
 import com.poison.wechart.common.utils.DateUtils;
 import com.poison.wechart.common.utils.JsonUtils;
+import com.poison.wechart.service.media.MediaService;
 import com.poison.wechart.utils.HttpsClientRequestFactory;
 import com.poison.wechart.utils.TokenUtils;
 import com.poison.wechart.utils.WriteText;
@@ -33,6 +34,8 @@ public class MessageServiceImpl implements MessageService {
 
     @Autowired
     TokenUtils tokenUtils;
+    @Autowired
+    MediaService mediaService;
     @Value("${weChart.agentId}")
     private Integer agentId;
     @Value("${file.errorPath}")
@@ -44,13 +47,15 @@ public class MessageServiceImpl implements MessageService {
         String token = getToken();
         String url="https://qyapi.weixin.qq.com/cgi-bin/message/send";
         url=url+"?access_token="+token;
-        String path =errorPath+ DateUtils.getNowStr();
+        String path =errorPath+ DateUtils.getNowStr()+".txt";
         //生成文件
         try {
             WriteText.writeToText(message.getContent(),path);
         }catch (Exception e){
             throw new CodeException(-1,"生成日志文件失败");
         }
+        //上传文件
+        String media_id =mediaService.uploadMediaByPath(path,"file");
         //制作请求体
         WeChatData weChatData=new WeChatData();
         String touser="";
@@ -62,14 +67,14 @@ public class MessageServiceImpl implements MessageService {
             }
         }
         weChatData.setTouser(touser);
-        weChatData.setMsgtype("text");
+        weChatData.setMsgtype("file");
         weChatData.setAgentid(agentId);
         weChatData.setToparty("");
         weChatData.setTotag("");
         weChatData.setSafe(0);
-        Map<Object, Object> content = new HashMap<Object, Object>();
-        content.put("content", message.getContent());
-        weChatData.setText(content);
+        Map<Object, Object> file = new HashMap<Object, Object>();
+        file.put("media_id", media_id);
+        weChatData.setFile(file);
         String requestJson=JsonUtils.ObjectToJson(weChatData);
         String result=post(url,requestJson);
         logger.info(result);
