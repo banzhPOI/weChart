@@ -1,9 +1,11 @@
 package com.poison.wechart.service.message;
 
 import com.poison.wechart.common.error.CodeException;
+import com.poison.wechart.common.utils.DateUtils;
 import com.poison.wechart.common.utils.JsonUtils;
 import com.poison.wechart.utils.HttpsClientRequestFactory;
 import com.poison.wechart.utils.TokenUtils;
+import com.poison.wechart.utils.WriteText;
 import com.poison.wechart.vo.Employee;
 import com.poison.wechart.vo.Message;
 import com.poison.wechart.vo.Result;
@@ -33,14 +35,22 @@ public class MessageServiceImpl implements MessageService {
     TokenUtils tokenUtils;
     @Value("${weChart.agentId}")
     private Integer agentId;
+    @Value("${file.errorPath}")
+    private String errorPath;
 
     @Override
     public void sendMsg(Message message){
         //获取token
-        RestTemplate rest = new RestTemplate(new HttpsClientRequestFactory());
         String token = getToken();
         String url="https://qyapi.weixin.qq.com/cgi-bin/message/send";
         url=url+"?access_token="+token;
+        String path =errorPath+ DateUtils.getNowStr();
+        //生成文件
+        try {
+            WriteText.writeToText(message.getContent(),path);
+        }catch (Exception e){
+            throw new CodeException(-1,"生成日志文件失败");
+        }
         //制作请求体
         WeChatData weChatData=new WeChatData();
         String touser="";
@@ -78,7 +88,7 @@ public class MessageServiceImpl implements MessageService {
 
     private static String post(String url, String requestJson){
         logger.debug(requestJson);
-        RestTemplate rest=new RestTemplate();
+        RestTemplate rest=new RestTemplate(new HttpsClientRequestFactory());
         HttpHeaders headers = new HttpHeaders();
         MediaType type = MediaType.parseMediaType("application/json; charset=UTF-8");
         headers.setContentType(type);
