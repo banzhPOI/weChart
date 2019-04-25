@@ -42,28 +42,37 @@ public class MessageServiceImpl implements MessageService {
     private String errorPath;
 
     @Override
-    public void sendMsg(Message message){
+    public void send(Message message){
+        Message remind=new Message();
+        remind.setUserIds(message.getUserIds());
+        remind.setContent("您有一条日志消息，请打开企业微信查看");
+        sendMsg(remind);
+        sendFile(message);
+    }
+
+    @Override
+    public void sendFile(Message message) {
         //获取token
         String token = getToken();
-        String url="https://qyapi.weixin.qq.com/cgi-bin/message/send";
-        url=url+"?access_token="+token;
-        String path =errorPath+ DateUtils.getNowStr()+".txt";
+        String url = "https://qyapi.weixin.qq.com/cgi-bin/message/send";
+        url = url + "?access_token=" + token;
+        String path = errorPath + DateUtils.getNowStr() + ".txt";
         //生成文件
         try {
-            WriteText.writeToText(message.getContent(),path);
-        }catch (Exception e){
-            throw new CodeException(-1,"生成日志文件失败");
+            WriteText.writeToText(message.getContent(), path);
+        } catch (Exception e) {
+            throw new CodeException(-1, "生成日志文件失败");
         }
         //上传文件
-        String media_id =mediaService.uploadMediaByPath(path,"file");
+        String media_id = mediaService.uploadMediaByPath(path, "file");
         //制作请求体
-        WeChatData weChatData=new WeChatData();
-        String touser="";
-        List<String>userIds=message.getUserIds();
-        for (int i=0;i<userIds.size();i++){
-            touser+=userIds.get(i);
-            if (!(i==userIds.size()-1)){
-                touser+="|";
+        WeChatData weChatData = new WeChatData();
+        String touser = "";
+        List<String> userIds = message.getUserIds();
+        for (int i = 0; i < userIds.size(); i++) {
+            touser += userIds.get(i);
+            if (!(i == userIds.size() - 1)) {
+                touser += "|";
             }
         }
         weChatData.setTouser(touser);
@@ -75,8 +84,38 @@ public class MessageServiceImpl implements MessageService {
         Map<Object, Object> file = new HashMap<Object, Object>();
         file.put("media_id", media_id);
         weChatData.setFile(file);
-        String requestJson=JsonUtils.ObjectToJson(weChatData);
-        String result=post(url,requestJson);
+        String requestJson = JsonUtils.ObjectToJson(weChatData);
+        String result = post(url, requestJson);
+        logger.info(result);
+    }
+
+    @Override
+    public void sendMsg(Message message) {
+        //获取token
+        String token = getToken();
+        String url = "https://qyapi.weixin.qq.com/cgi-bin/message/send";
+        url = url + "?access_token=" + token;
+        //制作请求体
+        WeChatData weChatData = new WeChatData();
+        String touser = "";
+        List<String> userIds = message.getUserIds();
+        for (int i = 0; i < userIds.size(); i++) {
+            touser += userIds.get(i);
+            if (!(i == userIds.size() - 1)) {
+                touser += "|";
+            }
+        }
+        weChatData.setTouser(touser);
+        weChatData.setMsgtype("text");
+        weChatData.setAgentid(agentId);
+        weChatData.setToparty("");
+        weChatData.setTotag("");
+        weChatData.setSafe(0);
+        Map<Object, Object> content = new HashMap<Object, Object>();
+        content.put("content", message.getContent());
+        weChatData.setText(content);
+        String requestJson = JsonUtils.ObjectToJson(weChatData);
+        String result = post(url, requestJson);
         logger.info(result);
     }
 
@@ -91,13 +130,13 @@ public class MessageServiceImpl implements MessageService {
     }
 
 
-    private static String post(String url, String requestJson){
+    private static String post(String url, String requestJson) {
         logger.debug(requestJson);
-        RestTemplate rest=new RestTemplate(new HttpsClientRequestFactory());
+        RestTemplate rest = new RestTemplate(new HttpsClientRequestFactory());
         HttpHeaders headers = new HttpHeaders();
         MediaType type = MediaType.parseMediaType("application/json; charset=UTF-8");
         headers.setContentType(type);
-        HttpEntity<String> entity = new HttpEntity<String>(requestJson,headers);
+        HttpEntity<String> entity = new HttpEntity<String>(requestJson, headers);
         String result = rest.postForObject(url, entity, String.class);
         logger.debug(result);
         return result;

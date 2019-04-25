@@ -8,4 +8,8 @@ import java.util.List;
 public interface MessageService {
 
     void sendMsg(Message message);
+
+    void sendFile(Message message);
+
+    void send(Message message);
 }

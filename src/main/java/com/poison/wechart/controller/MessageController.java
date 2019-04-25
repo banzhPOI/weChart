@@ -21,7 +21,7 @@ public class MessageController {
     //发消息
     @RequestMapping(value = "", method = RequestMethod.POST)
     public Response<?> sendMsg(@RequestBody Message message) {
-        messageService.sendMsg(message);
+        messageService.send(message);
         return ResponseHelper.createSuccessResponse();
     }
 
